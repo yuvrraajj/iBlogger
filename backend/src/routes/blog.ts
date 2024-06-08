@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
-import { CreateBlogInput,createBlogInput,updateBlogInput } from "iblogger-common";
+import {createBlogInput,updateBlogInput } from "iblogger-common";
 
 export const blogRouter=new Hono<
 {
@@ -38,9 +38,8 @@ catch (e){
 }
 })
 blogRouter.post('/',async (c) => {
-    const userId=c.get("userId");
     const body=await c.req.json();
-    const {success}=body.safeParse(createBlogInput);
+    const {success}=createBlogInput.safeParse(body);
     if(!success){
         c.status(403);
         return c.json({
@@ -48,6 +47,7 @@ blogRouter.post('/',async (c) => {
         })
 
     }
+    const userId=c.get("userId");
     const prisma=new PrismaClient({
         datasourceUrl:c.env.DATABASE_URL
     }).$extends(withAccelerate()) ;
@@ -70,7 +70,7 @@ blogRouter.put('/',async (c) => {
     const prisma=new PrismaClient({
         datasourceUrl:c.env.DATABASE_URL
     }).$extends(withAccelerate()) ;
-    const {success}=body.safeParse(updateBlogInput);
+    const {success}=updateBlogInput.safeParse(body);
     if(!success){
         c.status(403);
         return c.json({
@@ -78,7 +78,7 @@ blogRouter.put('/',async (c) => {
         })
 
     }
-    const blog=await prisma.post.update({
+const blog=await prisma.post.update({
         where:{
             id:body.id
         },
@@ -97,7 +97,18 @@ blogRouter.get('/bulk',async (c)=>{
     const prisma=new PrismaClient({
         datasourceUrl:c.env.DATABASE_URL
     }).$extends(withAccelerate()) ;
-    const blog=await prisma.post.findMany();
+    const blog=await prisma.post.findMany({
+        select:{
+            content:true,
+            title:true,
+            id:true,
+            author:{
+                select:{
+                    name:true
+                }
+            }            
+        }
+    });
     return c.json({blog});
 })
      
