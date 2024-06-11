@@ -4,7 +4,7 @@ interface BlogCardProps{
     title:string,
     content:string,
     date:string
-    id:number
+    id:string
 }
 export const BlogCard=({id,authorName,title,content,date}:BlogCardProps)=>{
     return <Link to={`/blog/${id}`}>
