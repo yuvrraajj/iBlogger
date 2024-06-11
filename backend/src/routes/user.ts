@@ -27,17 +27,14 @@ const prisma = new PrismaClient({
             error:"Input incorrect"
         })
     }
-       try{
+      
 		const user = await prisma.user.create({
 			data: {
 				email: body.email,
 				password: body.password,
-                name:body.name
+                name:body.x
 			}
-		});
-    } catch(e){
-        console.log(e);
-    }
+		}); 
 		const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
 		return c.json({ jwt });
 

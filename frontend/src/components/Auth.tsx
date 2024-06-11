@@ -14,13 +14,14 @@ export const Auth=({type}:{type:"signup"|"signin"})=>{
    async function sendReq(){
         try{
         const res= await axios.post(`${BACKEND_URL}/api/v1/user/${type=="signup"?"signup":"signin"}`,postinputs);
-        const jwt=res.data;
+        const jwt=await res.data;
         localStorage.setItem("token",jwt.jwt);
         console.log(jwt);
         navigate("/blogs");  
         }
         catch (e){
            alert(`Error while ${type=="signup"?"signing up":"signing in"}`);
+           console.log(e);
         } 
     }
     return <div className=" h-screen flex justify-center flex-col">  
