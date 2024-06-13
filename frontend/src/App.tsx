@@ -1,4 +1,4 @@
-import { BrowserRouter,Routes,Route, useNavigate, Navigate } from 'react-router-dom'
+import { BrowserRouter,Routes,Route, Navigate } from 'react-router-dom'
 import './App.css'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
@@ -7,7 +7,9 @@ import { Blogs } from './pages/Blogs'
 import { Publish } from './pages/Publish'
 import { MyBlogs } from './pages/MyBlogs'
 import { useAuth } from './hooks'
-
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
 function App() {
   return (
@@ -26,7 +28,7 @@ function App() {
     </>
   )
 }
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = useAuth();
 
   if (!isAuthenticated) {
@@ -34,8 +36,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/signin" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 };
-
 export default App
 
