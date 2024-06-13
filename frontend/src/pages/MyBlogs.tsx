@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AppBar } from "../components/AppBar";
 import { BlogCard } from "../components/BlogCard";
 import { BlogSkeleton } from "../components/Skeleton";
@@ -6,6 +6,8 @@ import { useMyBlogs } from "../hooks";
 
 export const MyBlogs = () => {
     const { loading, blogs } = useMyBlogs();
+    const navigate = useNavigate();
+
 
     if (loading) {
         return (
@@ -33,7 +35,8 @@ export const MyBlogs = () => {
                         <p>You haven't posted any blogs yet.</p>
                         <Link to="/create" className="text-blue-600 hover:text-blue-800 font-semibold">
                             Click here to create a blog
-                        </Link></div>
+                        </Link>
+                    </div>
                 </div>
             </div>
         );
@@ -42,8 +45,16 @@ export const MyBlogs = () => {
     return (
         <div>
             <AppBar />
-            <div className="flex flex-col items-center mt-10">
-                <h1 className="text-3xl font-bold text-center mb-8">My Blogs</h1>
+            <div className="flex justify-between items-center mt-4 mx-10">
+                <h1 className="text-3xl font-bold">My Blogs</h1>
+                <button onClick={()=>{
+                    localStorage.removeItem("token");
+                    navigate("/signin");
+                }} className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
+                    Logout
+                </button>
+            </div>
+            <div className="flex flex-col items-center mt-4">
                 <div className="w-full max-w-4xl space-y-4">
                     {blogs.map(blog => (
                         <BlogCard
