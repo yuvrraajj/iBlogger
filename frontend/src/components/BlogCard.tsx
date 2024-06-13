@@ -1,5 +1,5 @@
 import axios from "axios"
-import{Link, useNavigate} from "react-router-dom"
+import{ useNavigate} from "react-router-dom"
 import { BACKEND_URL } from "../config"
 interface BlogCardProps{
     authorName:string,
@@ -14,7 +14,7 @@ interface BlogCardProps{
 export const BlogCard = ({ id, authorName, title, content, date, owner }: BlogCardProps) => {
     const navigate = useNavigate();
 
-    const handleDelete = async (event) => {
+    const handleDelete = async (event:React.MouseEvent<HTMLElement>) => {
         event.stopPropagation(); // Prevent event from bubbling up to the link
 
         if (confirm('Are you sure you want to delete this blog post?')) {
