@@ -32,7 +32,7 @@ const prisma = new PrismaClient({
 			data: {
 				email: body.email,
 				password: body.password,
-                name:body.x
+                name:(body.name)?body.name:null
 			}
 		}); 
 		const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
@@ -67,3 +67,30 @@ userRouter.post('/signin',async (c)=>{
         const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
         return c.json({ jwt });
 })
+
+userRouter.get('/details/:id', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env?.DATABASE_URL	,
+    }).$extends(withAccelerate());
+    const userId = c.req.param("id");
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true
+            }
+        });
+
+        if (!user) {
+            return c.json({ error: 'User not found' });       }
+
+        return c.json({user});
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return c.json({ error: 'Internal server error' });
+    }
+});

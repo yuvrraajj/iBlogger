@@ -115,7 +115,91 @@ blogRouter.get('/bulk',async (c)=>{
         console.log(e);
     }    
 })
-     
+
+blogRouter.delete('/:id', async (c) => {
+    const userId = c.get("userId");  
+    const id = c.req.param("id");  
+    
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+    try {
+        
+        const blog = await prisma.post.findUnique({
+            where: {
+                id: id
+            },
+            select: {
+                authorId: true  
+            }
+        });
+
+        
+        if (!blog) {
+            c.status(404);
+            return c.json({ error: "Blog post not found" });
+        }
+
+        if (blog.authorId !== userId) {
+            c.status(403);
+            return c.json({ error: "You do not have permission to delete this blog post" });
+        }
+
+        
+        await prisma.post.delete({
+            where: {
+                id: id
+            }
+        });
+
+        return c.json({
+            message: "Blog post deleted successfully"
+        });
+    } catch (e) {
+        console.log(e);
+        c.status(500);
+        return c.json({
+            error: "An error occurred while deleting the blog post"
+        });
+    }
+});
+
+blogRouter.get('/my-blogs', async (c) => {
+    const userId = c.get("userId");  // Retrieve the userId stored in the context
+
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL
+    }).$extends(withAccelerate());
+
+    try {
+        // Fetch all posts where the authorId matches the userId from the context
+        const userBlogs = await prisma.post.findMany({
+            where: {
+                authorId: userId
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+
+        return c.json({
+            blogs: userBlogs
+        });
+    } catch (e) {
+           console.log(e);
+        c.status(500);
+        return c.json({
+            error: "An error occurred while fetching the user's blogs"
+        });
+    }
+});
 blogRouter.get('/:id',async (c) => {
     const id=c.req.param("id");
     const prisma=new PrismaClient({
@@ -148,5 +232,5 @@ catch (e){
         error:"Error while fetching blogs"
     })
 }
-}
-)
+})
+

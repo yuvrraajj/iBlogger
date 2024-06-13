@@ -3,6 +3,7 @@ import { Signupinput } from "iblogger-common";
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import { BACKEND_URL } from "../config";
+import { jwtDecode } from "jwt-decode";
 
 export const Auth=({type}:{type:"signup"|"signin"})=>{
     const navigate=useNavigate();
@@ -15,9 +16,8 @@ export const Auth=({type}:{type:"signup"|"signin"})=>{
         try{
         const res= await axios.post(`${BACKEND_URL}/api/v1/user/${type=="signup"?"signup":"signin"}`,postinputs);
         const jwt=await res.data;
-        localStorage.setItem("token",jwt.jwt);
-        console.log(jwt);
-        navigate("/blogs");  
+        localStorage.setItem("token",jwt.jwt);  
+        navigate("/blogs");
         }
         catch (e){
            alert(`Error while ${type=="signup"?"signing up":"signing in"}`);
