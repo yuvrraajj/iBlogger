@@ -5,7 +5,7 @@ import { useUser } from "../hooks";
 
 export const AppBar = () => {
     const token = localStorage.getItem("token");
-    const userid = token ? jwtDecode(token) : null; 
+    const userid = token ? jwtDecode(token) : null;
     //@ts-ignore
     const id = userid?.id || null; 
 
